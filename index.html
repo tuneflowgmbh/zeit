@@ -4,77 +4,139 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Zeit">
-<meta name="theme-color" content="#101218">
+<meta name="theme-color" content="#FAFAF7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex,nofollow">
+<link rel="apple-touch-icon" href="appicon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Crect width='1024' height='1024' rx='230.4' fill='%23161616'/%3E%3Cg transform='translate(153.6,729.1) scale(0.8239,-0.8239)'%3E%3Cpath fill='%2322B36B' fill-rule='evenodd' d='M263.5,0 H606.5 A263.5,263.5 0 0 1 606.5,527 H263.5 A263.5,263.5 0 0 1 263.5,0 Z M263.5,118 H606.5 A145.5,145.5 0 0 1 606.5,409 H263.5 A145.5,145.5 0 0 1 263.5,118 Z'/%3E%3Ccircle fill='%2322B36B' cx='606.5' cy='263.5' r='105'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Zeiterfassung</title>
 <style>
+/* TuneFlow Design Tokens v1, Marke 2026 */
+:root{
+  --tf-bg:#FAFAF7; --tf-surface:#FFFFFF; --tf-surface-2:#EDEDE7; --tf-line:#DEDED8;
+  --tf-ink:#161616; --tf-ink-2:#4A4A46; --tf-muted:#7A7A75;
+  --tf-accent:#22B36B; --tf-accent-soft:#DDF3E6; --tf-warn:#E0A52E; --tf-error:#D9473B;
+  --tf-font:"Onest","Helvetica Neue",Arial,sans-serif;
+  --tf-radius-input:10px; --tf-radius-card:12px; --tf-radius-panel:16px; --tf-radius-pill:999px;
+  --tf-control-h:44px; --tf-focus-ring:0 0 0 3px var(--tf-accent-soft);
+  --tf-ease:cubic-bezier(0.2,0.7,0.2,1); --tf-dur-hover:150ms;
+  /* Primärbutton: auf hellem Grund schwarz, nie grün */
+  --tf-btn-bg:#161616; --tf-btn-ink:#FAFAF7;
+}
+@media (prefers-color-scheme: dark){
   :root{
-    --bg:#101218; --card:#181b23; --card2:#1f232d; --line:#2a2f3b;
-    --fg:#e8eaf0; --muted:#8b93a6; --accent:#6c8cff; --run:#ff5c5c; --ok:#3ecf8e;
+    --tf-bg:#161616; --tf-surface:#1F1F1D; --tf-surface-2:#2A2A27; --tf-line:#33332F;
+    --tf-ink:#FAFAF7; --tf-ink-2:#C9C9C2; --tf-muted:#9A9A94;
+    --tf-accent-soft:#1D3A2A; --tf-focus-ring:0 0 0 3px #1D3A2A;
+    /* auf dunklem Grund darf Grün den Primärbutton tragen */
+    --tf-btn-bg:#22B36B; --tf-btn-ink:#161616;
   }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--fg);
-       font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
-       padding:max(14px,env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom))}
-  .wrap{max-width:560px;margin:0 auto}
-  h1{font-size:19px;margin:4px 0 2px;letter-spacing:-.2px}
-  .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
-  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);margin:0 0 11px;font-weight:600}
-  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
-  input,select,button{font:inherit;width:100%;border-radius:10px;border:1px solid var(--line);
-       background:var(--card2);color:var(--fg);padding:12px}
-  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
-  button{background:var(--accent);border:0;color:#fff;font-weight:600;cursor:pointer;margin-top:14px;padding:14px}
-  button:active{opacity:.85}
-  button:disabled{background:var(--card2);color:var(--muted);cursor:not-allowed}
-  button.stop{background:var(--run);margin-top:12px}
-  button.ghost{background:var(--card2);color:var(--fg);border:1px solid var(--line);font-weight:500;margin-top:8px;padding:10px}
-  .row{display:flex;gap:9px}
-  .row>*{flex:1;min-width:0}
-  /* laufender Timer */
-  #run{display:none;border-color:#52303a;background:linear-gradient(180deg,#241a20,#1b1a22)}
-  #run.on{display:block}
-  .rt{font-size:17px;font-weight:600;margin-bottom:3px;word-break:break-word}
-  .rm{color:var(--muted);font-size:13px}
-  .clock{font-size:38px;font-weight:700;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;margin:8px 0 0;color:#fff}
-  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--run);margin-right:7px;vertical-align:1px;animation:p 1.6s infinite}
-  @keyframes p{50%{opacity:.25}}
-  /* Summen */
-  .sums{display:flex;gap:9px;margin-bottom:12px}
-  .sum{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
-  .sum b{display:block;font-size:22px;font-weight:700;letter-spacing:-.6px}
-  .sum span{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px}
-  /* Listen */
-  ul{list-style:none;margin:0;padding:0}
-  li{display:flex;gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
-  li:first-child{border-top:0}
-  li .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  li .d{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-  .tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;white-space:nowrap}
-  .bar{height:5px;border-radius:3px;background:var(--accent);min-width:3px}
-  .kat{display:grid;grid-template-columns:1fr 54px 60px;gap:8px;align-items:center;padding:6px 0;font-size:13px}
-  .msg{margin:10px 0 0;padding:10px 12px;border-radius:10px;font-size:13px;display:none}
-  .msg.err{display:block;background:#3a1f24;border:1px solid #6b3139;color:#ffc9ce}
-  .msg.ok{display:block;background:#1d3328;border:1px solid #2f6b4c;color:#b6f0d0}
-  .hint{color:var(--muted);font-size:12px;margin-top:9px}
-  .foot{text-align:center;margin-top:18px}
-  .foot a{color:var(--muted);font-size:12px;text-decoration:none;border-bottom:1px dotted var(--line)}
+}
+@media (prefers-reduced-motion: reduce){ :root{ --tf-dur-hover:0ms } *{animation:none!important} }
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--tf-bg); color:var(--tf-ink);
+  font:400 16px/1.55 var(--tf-font);
+  padding:max(20px,env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
+}
+.wrap{max-width:560px;margin:0 auto}
+
+/* Kopf */
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+.logo{height:21px;width:auto;display:block;color:var(--tf-ink)}
+.wer{font:500 12px/1.3 var(--tf-font);letter-spacing:.08em;text-transform:uppercase;color:var(--tf-muted)}
+
+/* Karten */
+.card{background:var(--tf-surface);border:1px solid var(--tf-line);border-radius:var(--tf-radius-card);padding:20px;margin-bottom:14px}
+.card h2{font:500 12px/1.3 var(--tf-font);letter-spacing:.08em;text-transform:uppercase;color:var(--tf-muted);margin:0 0 14px}
+
+/* Formular */
+label{display:block;font:500 12px/1.3 var(--tf-font);letter-spacing:.08em;text-transform:uppercase;color:var(--tf-muted);margin:14px 0 6px}
+label:first-of-type{margin-top:0}
+input,select{
+  width:100%;height:var(--tf-control-h);padding:0 14px;color:var(--tf-ink);
+  background:var(--tf-surface);border:1px solid var(--tf-line);border-radius:var(--tf-radius-input);
+  font:400 16px/1.55 var(--tf-font);appearance:none;-webkit-appearance:none;
+}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--tf-muted) 50%),linear-gradient(135deg,var(--tf-muted) 50%,transparent 50%);
+  background-position:calc(100% - 19px) 19px,calc(100% - 14px) 19px;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:38px}
+input[type=date],input[type=time]{padding-right:8px}
+input:focus,select:focus{outline:none;border-color:var(--tf-accent);box-shadow:var(--tf-focus-ring)}
+input::placeholder{color:var(--tf-muted)}
+
+button{
+  width:100%;min-height:var(--tf-control-h);margin-top:18px;padding:12px 20px;cursor:pointer;
+  background:var(--tf-btn-bg);color:var(--tf-btn-ink);border:0;border-radius:var(--tf-radius-pill);
+  font:600 16px/1.25 var(--tf-font);transition:opacity var(--tf-dur-hover) var(--tf-ease);
+}
+button:hover{opacity:.88}
+button:disabled{background:var(--tf-surface-2);color:var(--tf-muted);cursor:not-allowed;opacity:1}
+button:focus-visible{outline:none;box-shadow:var(--tf-focus-ring)}
+
+/* laufender Eintrag */
+#run{display:none;background:var(--tf-accent-soft);border-color:var(--tf-accent)}
+#run.on{display:block}
+#run h2{color:var(--tf-ink-2)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:var(--tf-radius-pill);background:var(--tf-accent);margin-right:8px;vertical-align:1px;animation:puls 1.8s var(--tf-ease) infinite}
+@keyframes puls{50%{opacity:.3}}
+.rt{font:600 22px/1.25 var(--tf-font);letter-spacing:-.02em;margin-bottom:4px;word-break:break-word}
+.rm{color:var(--tf-ink-2);font:400 14px/1.5 var(--tf-font)}
+.clock{font:500 44px/1.1 var(--tf-font);letter-spacing:-.025em;font-variant-numeric:tabular-nums;margin-top:12px}
+
+/* Summen */
+.sums{display:flex;gap:14px;margin-bottom:14px}
+.sum{flex:1;background:var(--tf-surface);border:1px solid var(--tf-line);border-radius:var(--tf-radius-card);padding:18px 20px}
+.sum b{display:block;font:500 28px/1.1 var(--tf-font);letter-spacing:-.025em}
+.sum span{display:block;margin-top:6px;font:500 12px/1.3 var(--tf-font);letter-spacing:.08em;text-transform:uppercase;color:var(--tf-muted)}
+
+/* Listen */
+ul{list-style:none;margin:0;padding:0}
+li{display:block;padding:12px 0;border-top:1px solid var(--tf-line);font:400 14px/1.5 var(--tf-font)}
+li:first-child{border-top:0}
+.li-top{display:flex;gap:12px;align-items:baseline}
+.li-bot{display:flex;gap:8px;align-items:center;margin-top:6px}
+li .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tf-ink)}
+li .d{color:var(--tf-muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.badge{display:inline-block;height:26px;line-height:24px;padding:0 10px;border-radius:var(--tf-radius-pill);
+  border:1px solid var(--tf-line);background:var(--tf-surface-2);color:var(--tf-ink-2);
+  font:500 12px/24px var(--tf-font);white-space:nowrap}
+.kat{display:grid;grid-template-columns:1fr 72px 64px;gap:12px;align-items:center;padding:8px 0;font:400 14px/1.5 var(--tf-font)}
+.bar{height:6px;border-radius:var(--tf-radius-pill);background:var(--tf-accent);min-width:4px}
+
+/* Meldungen */
+.msg{margin-top:14px;padding:11px 14px;border-radius:var(--tf-radius-input);font:400 14px/1.5 var(--tf-font);display:none}
+.msg.err{display:block;background:var(--tf-surface-2);border:1px solid var(--tf-error);color:var(--tf-error)}
+.msg.ok{display:block;background:var(--tf-accent-soft);border:1px solid var(--tf-accent);color:var(--tf-ink)}
+.hint{margin-top:10px;color:var(--tf-muted);font:400 14px/1.5 var(--tf-font)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:0}
+@media (max-width:480px){ .row>*:first-child{flex:1 0 100%} }
+.lead{font:400 20px/1.5 var(--tf-font);color:var(--tf-ink-2);margin:0 0 24px}
+h1{font:500 32px/1.1 var(--tf-font);letter-spacing:-.025em;margin:0 0 8px}
+.foot{display:flex;justify-content:center;gap:18px;margin-top:24px}
+.foot a{color:var(--tf-muted);font:400 14px/1.5 var(--tf-font);text-decoration:none;border-bottom:1px solid var(--tf-line)}
+.foot a:hover{color:var(--tf-ink)}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- ===== Einrichtung (nur beim ersten Mal) ===== -->
+  <!-- Einrichtung, nur beim ersten Mal -->
   <div id="setup" style="display:none">
+    <header><svg class="logo" id="logo1"></svg></header>
     <h1>Einmal einrichten</h1>
-    <p class="sub">Beides bleibt nur in diesem Browser gespeichert und wird nirgendwo mitgeschickt außer an Notion.</p>
+    <p class="lead">Beides bleibt nur in diesem Browser und geht nirgendwo hin außer zu Notion.</p>
     <div class="card">
       <h2>Zugang</h2>
       <label for="s_tok">Notion Integration Token</label>
-      <input id="s_tok" type="password" placeholder="ntn_..." autocomplete="off" spellcheck="false">
+      <input id="s_tok" type="password" placeholder="ntn_…" autocomplete="off" spellcheck="false">
       <label for="s_who">Ich bin</label>
       <select id="s_who"></select>
       <button id="s_save">Speichern und starten</button>
@@ -82,20 +144,22 @@
     </div>
   </div>
 
-  <!-- ===== App ===== -->
+  <!-- App -->
   <main id="app" style="display:none">
-    <h1>Zeiterfassung</h1>
-    <p class="sub" id="who"></p>
+    <header>
+      <svg class="logo" id="logo2"></svg>
+      <span class="wer" id="who"></span>
+    </header>
 
     <div class="card" id="run">
       <h2><span class="dot"></span>läuft gerade</h2>
       <div class="rt" id="run_t"></div>
       <div class="rm" id="run_m"></div>
       <div class="clock" id="run_c">0:00</div>
-      <button class="stop" id="btn_stop">Stoppen</button>
+      <button id="btn_stop">Stoppen</button>
     </div>
 
-    <div class="card" id="startcard">
+    <div class="card">
       <h2>Neu starten</h2>
       <label for="n_t">Was machst du?</label>
       <input id="n_t" placeholder="z. B. Cold Calls Hausverwaltungen" autocomplete="off">
@@ -127,7 +191,7 @@
     </div>
 
     <div class="card">
-      <h2>Letzte Einträge</h2>
+      <h2>Meine letzten Einträge</h2>
       <ul id="list"><li class="d">lade…</li></ul>
     </div>
 
@@ -138,7 +202,6 @@
 
     <div class="foot">
       <a href="https://app.notion.com/3b75ff050ccb8108a6b1d8b29c3e87dd" target="_blank" rel="noreferrer">in Notion öffnen</a>
-      &nbsp;·&nbsp;
       <a href="#" id="reset">Zugang zurücksetzen</a>
     </div>
   </main>
@@ -148,25 +211,25 @@
 "use strict";
 
 /* ---------- feste Werte aus der Notion-Datenbank ---------- */
-var DS   = "3b75ff05-0ccb-818b-af1c-000baab10250";   // Data Source "Zeiterfassung"
-var NV   = "2025-09-03";                              // Notion-API-Version
+var DS = "3b75ff05-0ccb-818b-af1c-000baab10250";   // Data Source "Zeiterfassung"
+var NV = "2025-09-03";                              // Notion-API-Version
 var PEOPLE = [
-  { id:"382d872b-594c-8115-b3ed-0002827ea43b", name:"Chidera",    kurz:"C" },
-  { id:"382d872b-594c-8111-8499-0002f48fd7d2", name:"Alexander",  kurz:"A" }
+  { id:"382d872b-594c-8115-b3ed-0002827ea43b", name:"Chidera"   },
+  { id:"382d872b-594c-8111-8499-0002f48fd7d2", name:"Alexander" }
 ];
 var CATS = ["Vertrieb","Sales-Vorbereitung","Sales-Call","Meeting","Beratung",
             "Automation","Administration","Infrastruktur","Sonstiges"];
 
-/* ---------- Zustand ---------- */
+/* Wortmarke, Schalter bleibt grün, Schrift folgt der Textfarbe */
+var LOGO = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4931.8 1242.8" role="img" aria-label="TuneFlow"><title>TuneFlow</title><g transform="translate(248.2,971.6) scale(1,-1)"><path fill="currentColor" d="M285.2 0Q219.2 0 177 16.2Q134.8 32.4 114.4 70.7Q94 109 94 176V402.2H15.8V527H94V668.4H234.2V527H348.8V402.2H234.2V195.8Q234.2 162.8 245.9 144.1Q257.6 125.4 300.2 125.4H344V0Z M620.2 -7.2Q504 -7.2 441.5 52.3Q379 111.8 379 232.4V527H519.2V242.4Q519.2 206 529.4 178.3Q539.6 150.6 562 135Q584.4 119.4 620.2 119.4Q659.2 119.4 680.3 136.2Q701.4 153 709.3 181.3Q717.2 209.6 717.2 242.4V527H857.4V232.4Q857.4 107 794.5 49.9Q731.6 -7.2 620.2 -7.2Z M926 0V527H1056.6L1064.2 466.2Q1086.4 493.4 1114.7 508.5Q1143 523.6 1172.6 529.8Q1202.2 536 1226.4 536Q1301.6 536 1344.5 502.8Q1387.4 469.6 1405.6 414.2Q1423.8 358.8 1423.8 291V0H1283.6V272.8Q1283.6 297.2 1279.7 321.3Q1275.8 345.4 1265.3 365.2Q1254.8 385 1235.8 396.9Q1216.8 408.8 1185.6 408.8Q1146.2 408.8 1119.3 388.8Q1092.4 368.8 1079.3 335.1Q1066.2 301.4 1066.2 259.6V0Z M1731.6 -7.2Q1649.4 -7.2 1591.1 26.1Q1532.8 59.4 1501.9 119.8Q1471 180.2 1471 261.2Q1471 342.6 1502.8 404.3Q1534.6 466 1593.2 501Q1651.8 536 1732.4 536Q1792 536 1837.4 515.8Q1882.8 495.6 1914.2 459.6Q1945.6 423.6 1961.3 376.2Q1977 328.8 1976.2 274Q1975.8 260.2 1974.7 247.3Q1973.6 234.4 1970.8 220.6H1610.4Q1613.2 190.8 1627.1 165.8Q1641 140.8 1666.4 126.2Q1691.8 111.6 1730 111.6Q1754.8 111.6 1775.9 117.5Q1797 123.4 1812.2 135.2Q1827.4 147 1832.8 163.2H1971.4Q1958.2 103.8 1922.5 65.9Q1886.8 28 1836.9 10.4Q1787 -7.2 1731.6 -7.2ZM1841.8 319.2Q1841.4 346.2 1828.7 369.7Q1816 393.2 1791.3 407.4Q1766.6 421.6 1729.4 421.6Q1691.2 421.6 1665.8 406.6Q1640.4 391.6 1627.5 368.1Q1614.6 344.6 1613 319.2Z M2070.4 0V402.2H1991V527H2070.4V574.6Q2070.4 635.2 2089.6 673.7Q2108.8 712.2 2149.5 730.2Q2190.2 748.2 2253.2 748.2H2340.2V624H2270.6Q2247.8 624 2234.6 616.8Q2221.4 609.6 2216 595.2Q2210.6 580.7 2210.6 559.8V527H2340.2V402.2H2210.6V0Z M2370 0V707.6H2510.2V0Z"></path><path fill="#22B36B" fill-rule="evenodd" d="M2865.7,0 H3208.7 A263.5,263.5 0 0 1 3208.7,527 H2865.7 A263.5,263.5 0 0 1 2865.7,0 Z M2865.7,118 H3208.7 A145.5,145.5 0 0 1 3208.7,409 H2865.7 A145.5,145.5 0 0 1 2865.7,118 Z"></path><circle fill="#22B36B" cx="3208.7" cy="263.5" r="105"></circle><path fill="currentColor" transform="translate(-200.7,0)" d="M3922.7 0 3756.9 527H3910.5L4007.7 160L4111.9 527H4269.5L4373.5 160L4469.3 527H4620.3L4454.5 0H4293.5L4188.1 356.2L4083.9 0Z"></path></g></svg>';
+
 var token = localStorage.getItem("zeit_token") || "";
 var meId  = localStorage.getItem("zeit_me")    || "";
-var running = null;       // { id, titel, kategorie, start:Date }
-var ticker  = null;
+var running = null, ticker = null;
 
 var $ = function(id){ return document.getElementById(id); };
 
-/* ---------- Zeit-Helfer: immer LOKALE Zeit mit Offset senden,
-     weil Notion den mitgeschickten Offset wörtlich speichert ---------- */
+/* ---------- Zeit: lokale Zeit mit Offset, Notion speichert ihn wörtlich ---------- */
 function p2(n){ return String(Math.abs(Math.floor(n))).padStart(2,"0"); }
 function isoLocal(d){
   var off = -d.getTimezoneOffset();
@@ -174,9 +237,7 @@ function isoLocal(d){
          p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds())+
          (off>=0?"+":"-")+p2(off/60)+":"+p2(Math.abs(off)%60);
 }
-function dateLocal(d){
-  return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());
-}
+function dateLocal(d){ return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); }
 function uhr(d){ return p2(d.getHours())+":"+p2(d.getMinutes()); }
 function fmtMin(m){
   m = Math.max(0, Math.round(m));
@@ -189,7 +250,7 @@ function fmtClock(sek){
 }
 function montag(){
   var d = new Date(); d.setHours(0,0,0,0);
-  d.setDate(d.getDate() - ((d.getDay()+6)%7));   // Woche beginnt Montag
+  d.setDate(d.getDate() - ((d.getDay()+6)%7));
   return d;
 }
 
@@ -197,17 +258,11 @@ function montag(){
 function api(path, method, body){
   return fetch("https://api.notion.com/v1/"+path, {
     method: method || "GET",
-    headers: {
-      "Authorization": "Bearer "+token,
-      "Notion-Version": NV,
-      "Content-Type": "application/json"
-    },
+    headers: { "Authorization":"Bearer "+token, "Notion-Version":NV, "Content-Type":"application/json" },
     body: body ? JSON.stringify(body) : undefined
   }).then(function(r){
     return r.json().catch(function(){ return {}; }).then(function(j){
-      if (!r.ok || j.object === "error") {
-        throw new Error((j.message || ("HTTP "+r.status)));
-      }
+      if (!r.ok || j.object === "error") throw new Error(j.message || ("HTTP "+r.status));
       return j;
     });
   });
@@ -227,14 +282,12 @@ function titelVon(page){
   return (page.properties["Tätigkeit"].title || [])
          .map(function(t){ return t.plain_text; }).join("") || "(ohne Titel)";
 }
-
-/* ---------- Meldungen ---------- */
 function msg(el, text, art){
   el.textContent = text || "";
   el.className = "msg" + (text ? " "+art : "");
 }
 
-/* ---------- laden ---------- */
+/* ---------- laden: ausschließlich eigene Einträge ---------- */
 function laden(){
   var seit14 = new Date(); seit14.setHours(0,0,0,0); seit14.setDate(seit14.getDate()-13);
 
@@ -249,7 +302,10 @@ function laden(){
   });
 
   var qList = api("data_sources/"+DS+"/query", "POST", {
-    filter: { property:"Start", date:{ on_or_after: dateLocal(seit14) } },
+    filter: { and: [
+      { property:"Start",  date:{ on_or_after: dateLocal(seit14) } },
+      { property:"Person", people:{ contains: meId } }
+    ]},
     sorts: [{ property:"Start", direction:"descending" }],
     page_size: 100
   });
@@ -278,8 +334,7 @@ function zeigeLaufend(page){
     start: new Date(page.properties["Start"].date.start)
   };
   $("run_t").textContent = running.titel;
-  $("run_m").textContent = (running.kategorie ? running.kategorie+" · " : "") +
-                           "seit " + uhr(running.start) + " Uhr";
+  $("run_m").textContent = (running.kategorie ? running.kategorie+" · " : "") + "seit " + uhr(running.start) + " Uhr";
   $("run").className = "card on";
   $("btn_start").disabled = true;
   $("start_hint").style.display = "block";
@@ -294,10 +349,8 @@ function zeigeListe(rows){
   var wStart = montag().getTime(), sumW = 0, sum14 = 0, perKat = {};
 
   rows.forEach(function(r){
-    var min  = (r.properties["Dauer (min)"].formula || {}).number || 0;
-    var mein = (r.properties["Person"].people || [])
-               .some(function(u){ return u.id === meId; });
-    if (!mein || min <= 0) return;
+    var min = (r.properties["Dauer (min)"].formula || {}).number || 0;
+    if (min <= 0) return;                     // laufende Einträge zählen noch nicht
     sum14 += min;
     var st = r.properties["Start"].date;
     if (st && new Date(st.start).getTime() >= wStart) sumW += min;
@@ -308,36 +361,30 @@ function zeigeListe(rows){
   $("sum_w").textContent  = fmtMin(sumW);
   $("sum_14").textContent = fmtMin(sum14);
 
-  /* letzte Einträge, alle Personen, damit nichts still fehlt */
   var ul = $("list"); ul.innerHTML = "";
-  if (!rows.length) {
-    ul.innerHTML = '<li class="d">noch nichts in den letzten 14 Tagen</li>';
-  }
+  if (!rows.length) { ul.innerHTML = '<li class="d">noch nichts in den letzten 14 Tagen</li>'; }
   rows.slice(0, 7).forEach(function(r){
-    var pr   = r.properties;
-    var min  = (pr["Dauer (min)"].formula || {}).number || 0;
-    var st   = pr["Start"].date ? new Date(pr["Start"].date.start) : null;
-    var kurz = (pr["Person"].people || []).map(function(u){
-                 var f = PEOPLE.filter(function(x){ return x.id === u.id; })[0];
-                 return f ? f.kurz : "?";
-               }).join("");
-    var offen = !pr["Ende"].date;
-    var li = document.createElement("li");
+    var pr  = r.properties;
+    var min = (pr["Dauer (min)"].formula || {}).number || 0;
+    var st  = pr["Start"].date ? new Date(pr["Start"].date.start) : null;
     var tag = (pr["Kategorie"].select || {}).name || "";
+    var li  = document.createElement("li");
     li.innerHTML =
-      '<span class="d">' + (st ? p2(st.getDate())+"."+p2(st.getMonth()+1) : "--") + '</span>' +
-      '<span class="t">' + esc(titelVon(r)) + '</span>' +
-      (tag  ? '<span class="tag">' + esc(tag) + '</span>' : '') +
-      (kurz ? '<span class="tag">' + esc(kurz) + '</span>' : '') +
-      '<span class="d">' + (offen ? "läuft" : fmtMin(min)) + '</span>';
+      '<div class="li-top">' +
+        '<span class="t">' + esc(titelVon(r)) + '</span>' +
+        '<span class="d">' + (pr["Ende"].date ? fmtMin(min) : "läuft") + '</span>' +
+      '</div>' +
+      '<div class="li-bot">' +
+        '<span class="d">' + (st ? p2(st.getDate())+"."+p2(st.getMonth()+1) : "--") + '</span>' +
+        (tag ? '<span class="badge">' + esc(tag) + '</span>' : '') +
+      '</div>';
     ul.appendChild(li);
   });
 
-  /* Verteilung */
   var kl = $("katlist"); kl.innerHTML = "";
   var paare = Object.keys(perKat).map(function(k){ return [k, perKat[k]]; })
                     .sort(function(a,b){ return b[1]-a[1]; });
-  if (!paare.length) { kl.innerHTML = '<div class="rm">noch keine eigenen Einträge</div>'; return; }
+  if (!paare.length) { kl.innerHTML = '<div class="rm">noch keine Einträge</div>'; return; }
   var max = paare[0][1];
   paare.forEach(function(p){
     var d = document.createElement("div");
@@ -377,19 +424,17 @@ function stop(){
   var b = $("btn_stop"); b.disabled = true; b.textContent = "…";
   api("pages/"+running.id, "PATCH", {
     properties: { "Ende": { date:{ start: isoLocal(new Date()) } } }
-  }).then(function(){
-    return laden();
-  }).catch(function(e){
-    msg($("start_msg"), "Stoppen fehlgeschlagen: "+e.message, "err");
-  }).then(function(){ b.disabled = false; b.textContent = "Stoppen"; });
+  }).then(function(){ return laden(); })
+    .catch(function(e){ msg($("start_msg"), "Stoppen fehlgeschlagen: "+e.message, "err"); })
+    .then(function(){ b.disabled = false; b.textContent = "Stoppen"; });
 }
 
 function nachtragen(){
   var t = $("m_t").value.trim(), d = $("m_d").value,
       v = $("m_v").value, bis = $("m_b").value;
   var box = $("add_msg");
-  if (!t)                { msg(box, "Titel fehlt.", "err"); return; }
-  if (!d || !v || !bis)  { msg(box, "Datum, Von und Bis ausfüllen.", "err"); return; }
+  if (!t)               { msg(box, "Titel fehlt.", "err"); return; }
+  if (!d || !v || !bis) { msg(box, "Datum, Von und Bis ausfüllen.", "err"); return; }
   var von  = new Date(d+"T"+v+":00");
   var ende = new Date(d+"T"+bis+":00");
   if (isNaN(von) || isNaN(ende)) { msg(box, "Zeit konnte nicht gelesen werden.", "err"); return; }
@@ -417,17 +462,25 @@ function fuelle(sel, werte){
     sel.appendChild(o);
   });
 }
-
 function app(){
   $("setup").style.display = "none";
   $("app").style.display = "block";
   var me = PEOPLE.filter(function(p){ return p.id === meId; })[0];
-  $("who").textContent = (me ? me.name : "unbekannt") + " · Start, Stopp, Nachtrag landen direkt in Notion";
+  $("who").textContent = me ? me.name : "unbekannt";
   $("m_d").value = dateLocal(new Date());
   laden();
 }
 
 (function init(){
+  var inner = LOGO.replace(/^<svg[^>]*>|<\/svg>$/g, "");
+  ["logo1","logo2"].forEach(function(id){
+    var el = $(id);
+    el.setAttribute("viewBox", "0 0 4931.8 1242.8");
+    el.setAttribute("role", "img");
+    el.setAttribute("aria-label", "TuneFlow");
+    el.innerHTML = inner;
+  });
+
   fuelle($("n_k"), CATS);
   fuelle($("m_k"), CATS);
   fuelle($("s_who"), PEOPLE.map(function(p){ return { value:p.id, text:p.name }; }));
@@ -460,8 +513,7 @@ function app(){
     if (!document.hidden && token && meId) laden();
   });
 
-  if (token && meId) app();
-  else $("setup").style.display = "block";
+  if (token && meId) app(); else $("setup").style.display = "block";
 })();
 </script>
 </body>
