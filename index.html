@@ -114,6 +114,7 @@ li .d{color:var(--tf-muted);font-variant-numeric:tabular-nums;white-space:nowrap
 .msg{margin-top:14px;padding:11px 14px;border-radius:var(--tf-radius-input);font:400 14px/1.5 var(--tf-font);display:none}
 .msg.err{display:block;background:var(--tf-surface-2);border:1px solid var(--tf-error);color:var(--tf-error)}
 .msg.ok{display:block;background:var(--tf-accent-soft);border:1px solid var(--tf-accent);color:var(--tf-ink)}
+.versteckt{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
 .hint{margin-top:10px;color:var(--tf-muted);font:400 14px/1.5 var(--tf-font)}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .row>*{flex:1;min-width:0}
@@ -133,15 +134,19 @@ h1{font:500 32px/1.1 var(--tf-font);letter-spacing:-.025em;margin:0 0 8px}
     <header><svg class="logo" id="logo1"></svg></header>
     <h1>Einmal einrichten</h1>
     <p class="lead">Beides bleibt nur in diesem Browser und geht nirgendwo hin außer zu Notion.</p>
-    <div class="card">
+    <form class="card" id="s_form" action="#" method="post">
       <h2>Zugang</h2>
+      <input type="text" name="username" value="TuneFlow Zeiterfassung" autocomplete="username"
+             readonly tabindex="-1" aria-hidden="true" class="versteckt">
       <label for="s_tok">Notion Integration Token</label>
-      <input id="s_tok" type="password" placeholder="ntn_…" autocomplete="off" spellcheck="false">
+      <input id="s_tok" name="password" type="password" placeholder="ntn_…"
+             autocomplete="current-password" spellcheck="false" autocapitalize="off" autocorrect="off">
       <label for="s_who">Ich bin</label>
       <select id="s_who"></select>
-      <button id="s_save">Speichern und starten</button>
+      <button id="s_save" type="submit">Speichern und starten</button>
       <div id="s_msg" class="msg"></div>
-    </div>
+      <div class="hint">Lass ihn vom Schlüsselbund sichern, dann füllt ihn dein iPhone selbst aus.</div>
+    </form>
   </div>
 
   <!-- App -->
@@ -494,7 +499,8 @@ function app(){
     localStorage.removeItem("zeit_token"); localStorage.removeItem("zeit_me");
     location.reload();
   });
-  $("s_save").addEventListener("click", function(){
+  $("s_form").addEventListener("submit", function(ev){
+    ev.preventDefault();
     var t = $("s_tok").value.trim(), w = $("s_who").value;
     if (!t) { msg($("s_msg"), "Token fehlt.", "err"); return; }
     var b = $("s_save"); b.disabled = true; b.textContent = "prüfe…";
