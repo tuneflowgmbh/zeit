@@ -107,7 +107,7 @@ li .d{color:var(--tf-muted);font-variant-numeric:tabular-nums;white-space:nowrap
 .badge{display:inline-block;height:26px;line-height:24px;padding:0 10px;border-radius:var(--tf-radius-pill);
   border:1px solid var(--tf-line);background:var(--tf-surface-2);color:var(--tf-ink-2);
   font:500 12px/24px var(--tf-font);white-space:nowrap}
-.kat{display:grid;grid-template-columns:1fr 72px 64px;gap:12px;align-items:center;padding:8px 0;font:400 14px/1.5 var(--tf-font)}
+.kat{display:grid;grid-template-columns:1fr 64px 60px 40px;gap:12px;align-items:center;padding:8px 0;font:400 14px/1.5 var(--tf-font)}
 .bar{height:6px;border-radius:var(--tf-radius-pill);background:var(--tf-accent);min-width:4px}
 
 /* Meldungen */
@@ -395,7 +395,8 @@ function zeigeListe(rows){
     d.className = "kat";
     d.innerHTML = '<span class="t">' + esc(p[0]) + '</span>' +
                   '<span class="bar" style="width:' + Math.round(p[1]/max*100) + '%"></span>' +
-                  '<span class="d" style="text-align:right">' + fmtMin(p[1]) + '</span>';
+                  '<span class="d" style="text-align:right">' + fmtMin(p[1]) + '</span>' +
+                  '<span class="d" style="text-align:right">' + Math.round(p[1]/sum14*100) + ' %</span>';
     kl.appendChild(d);
   });
 }
